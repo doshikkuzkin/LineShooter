@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameObjectPool<T> where T : UnityEngine.Component
@@ -14,18 +15,16 @@ public class GameObjectPool<T> where T : UnityEngine.Component
 		_poolItems = new Queue<T>();
 	}
 
-	public T Get()
+	public T Get(bool activate = true)
 	{
-		if (_poolItems.TryDequeue(out T view))
-		{
-			view.gameObject.SetActive(true);
+        if (!_poolItems.TryDequeue(out T view))
+        {
+            view = InstantiateObject();
+        }
 
-			return view;
-		}
-		else
-		{
-			return InstantiateObject();
-		}
+        view.gameObject.SetActive(activate);
+
+		return view;
 	}
 
 	public void Return(T view)

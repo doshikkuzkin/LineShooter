@@ -15,4 +15,5 @@ MonoBehaviour:
   PlayerSettings:
     Hp: 5
     Damage: 1
+    Speed: 3
     Prefab: {fileID: 2792971534621763075, guid: 2a3f4286732061a4f845a07752c53703, type: 3}

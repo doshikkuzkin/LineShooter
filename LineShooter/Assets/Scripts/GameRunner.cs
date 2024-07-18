@@ -5,36 +5,102 @@ public class GameRunner : MonoBehaviour
 	[SerializeField]
 	private EnemiesSettingsScriptableObject _enemiesSettings;
 
-	[SerializeField]
+    [SerializeField]
+    private PlayerSettingsScriptableObject _playerSettings;
+
+    [SerializeField]
+    private Transform _playerSpawnPoint;
+
+    [SerializeField]
 	private Transform[] _enemiesSpawnPoints;
 
     [SerializeField]
     private Transform _finishLine;
 
-	private EnemiesController _enemiesController;
+    [SerializeField]
+    private InGameUIView _gameUIView;
+
+    [SerializeField]
+    private StartGameUIView _startGameUIView;
+
+    [SerializeField]
+    private RestartGameUIView _restartGameUIView;
+
+    private EnemiesController _enemiesController;
+    private PlayerController _playerController;
 
     private bool _isGameRunning;
 
     private void Awake()
     {
 		_enemiesController = new EnemiesController(_enemiesSettings.EnemiesSettings, _enemiesSpawnPoints, _finishLine.position);
+        _playerController = new PlayerController(_playerSettings.PlayerSettings, _playerSpawnPoint, _finishLine);
+
+        _startGameUIView.gameObject.SetActive(true);
+        _restartGameUIView.gameObject.SetActive(false);
+
+        _startGameUIView.StartButtonClicked += OnStartButtonClicked;
+        _restartGameUIView.StartButtonClicked += OnRestartButtonClicked;
     }
 
-    private void Start()
+    private void OnStartButtonClicked()
     {
-		StartGame();
+       _startGameUIView.gameObject.SetActive(false);
 
-        Vector2 min = Camera.main.ViewportToWorldPoint(new Vector2(0, 0)); // bottom-left corner
-        Vector2 max = Camera.main.ViewportToWorldPoint(new Vector2(1, 1)); // top-right corner
+        StartGame();
+    }
 
-        Debug.Log(min);
-        Debug.Log(max);
+    private void OnRestartButtonClicked()
+    {
+        _restartGameUIView.gameObject.SetActive(false);
+
+        StartGame();
     }
 
     private void StartGame()
 	{
 		_isGameRunning = true;
-	}
+
+        _gameUIView.SetHpText(_playerSettings.PlayerSettings.Hp);
+        _enemiesController.Reset();
+        _playerController.Start();
+
+        Subscribe();
+    }
+
+    private void Subscribe()
+    {
+        _enemiesController.EnemyHitFinishLine += OnEnemyHitFinishLine;
+        _playerController.PlayerHpChanged += OnPlayerHpChanged;
+        _playerController.PlayerLost += OnPlayerLost;
+    }
+
+    private void Unsubscribe()
+    {
+        _enemiesController.EnemyHitFinishLine -= OnEnemyHitFinishLine;
+        _playerController.PlayerHpChanged -= OnPlayerHpChanged;
+        _playerController.PlayerLost -= OnPlayerLost;
+    }
+
+    private void OnEnemyHitFinishLine()
+    {
+        _playerController.DecreaseHp();
+    }
+
+    private void OnPlayerHpChanged(int currentHp)
+    {
+        _gameUIView.SetHpText(currentHp);
+    }
+
+    private void OnPlayerLost()
+    {
+        _isGameRunning = false;
+
+        _restartGameUIView.SetupText(false);
+        _restartGameUIView.gameObject.SetActive(true);
+
+        Unsubscribe();
+    }
 
     private void Update()
     {
@@ -43,6 +109,7 @@ public class GameRunner : MonoBehaviour
             return;
         }
 
+        _playerController.Update();
         _enemiesController.Update();
     }
 }

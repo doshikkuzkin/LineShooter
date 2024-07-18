@@ -21,6 +21,8 @@ public class EnemiesController
 
     public bool HasEnemiesLeft => _enemiesToSpawnLeft > 0 || _activeEnemies.Count > 0;
 
+    public event Action EnemyHitFinishLine;
+
     public EnemiesController(EnemiesSettings enemiesSettings, Transform[] enemiesSpawnPoints, Vector3 finishLinePosition)
     {
         _enemiesSettings = enemiesSettings;
@@ -42,6 +44,8 @@ public class EnemiesController
         {
             _enemiesPool.Return(enemy);
         }
+
+        _activeEnemies.Clear();
     }
 
     public void Update()
@@ -89,6 +93,8 @@ public class EnemiesController
         {
             if (IsReachedFinishLine(enemy.Position))
             {
+                EnemyHitFinishLine?.Invoke();
+
                 _enemiesToDestroy.Add(enemy);
             }
         }
