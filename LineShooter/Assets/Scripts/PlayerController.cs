@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PlayerController
 {
+    private const float PlayerBoundariesOffset = .5f;
+
     private readonly PlayerSettings _settings;
     private readonly Transform _playerSpawnPoint;
     private readonly Transform _finishLine;
@@ -30,8 +32,8 @@ public class PlayerController
         Vector2 leftCorner = Camera.main.ViewportToWorldPoint(new Vector2(0, 0));
         Vector2 rightCorner = Camera.main.ViewportToWorldPoint(new Vector2(1, 0));
 
-        _bottomLeftBoundary = new Vector2(leftCorner.x, leftCorner.y);
-        _topRightBoundary = new Vector2(rightCorner.x, _finishLine.position.y);
+        _bottomLeftBoundary = new Vector2(leftCorner.x + PlayerBoundariesOffset, leftCorner.y + PlayerBoundariesOffset);
+        _topRightBoundary = new Vector2(rightCorner.x - PlayerBoundariesOffset, _finishLine.position.y - PlayerBoundariesOffset);
     }
 
     public void Start()

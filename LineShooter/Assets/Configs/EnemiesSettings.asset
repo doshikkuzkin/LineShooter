@@ -15,8 +15,13 @@ MonoBehaviour:
   EnemiesSettings:
     MinSpawnDelay: 0.5
     MaxSpawnDelay: 3
-    EnemiesToSpawn: 20
+    MinEnemiesCount: 5
+    MaxEnemiesCount: 15
     MinSpeed: 1
     MaxSpeed: 3
-    Hp: 1
-    Prefab: {fileID: 4424582987365880516, guid: bf7c752f74719a74a8bb2d6adea9dbe6, type: 3}
+    Hp: 2
+    EnemiesGraphics:
+    - Type: 0
+      Prefab: {fileID: 4424582987365880516, guid: bf7c752f74719a74a8bb2d6adea9dbe6, type: 3}
+    - Type: 1
+      Prefab: {fileID: 2795765503759031825, guid: 85af3e0f14478614585e7aaa45508a23, type: 3}

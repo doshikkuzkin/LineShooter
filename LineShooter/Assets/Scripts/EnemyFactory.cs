@@ -1,24 +1,22 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyFactory
 {
-	private GameObjectPool<Enemy> _enemyObectsPool;
+	private readonly Dictionary<EnemyType, GameObjectPool<Enemy>> _enemyMap;
 
-	public EnemyFactory(GameObjectPool<Enemy> enemyObectsPool)
+    public EnemyFactory(Dictionary<EnemyType, GameObjectPool<Enemy>> enemyMap)
 	{
-		_enemyObectsPool = enemyObectsPool;
+		_enemyMap = enemyMap;
 	}
 
-	public Enemy Create(Vector3 spawnPosition, float speed, int hp)
+	public Enemy Create(EnemyType enemyType, Vector3 spawnPosition, float speed, int hp)
 	{
-		return SpawnEnemy(spawnPosition, speed, hp);
+		return CreateInternal(_enemyMap[enemyType].Get(), spawnPosition, speed, hp);
 	}
 
-	private Enemy SpawnEnemy(Vector3 spawnPosition, float speed, int hp)
+	private Enemy CreateInternal(Enemy enemyObject, Vector3 spawnPosition, float speed, int hp)
 	{
-		var enemyObject = _enemyObectsPool.Get();
 		enemyObject.SetUp(spawnPosition, speed, hp);
 
 		return enemyObject;

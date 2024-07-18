@@ -41,6 +41,13 @@ public class GameRunner : MonoBehaviour
 
         _startGameUIView.StartButtonClicked += OnStartButtonClicked;
         _restartGameUIView.StartButtonClicked += OnRestartButtonClicked;
+
+        UpdateHpText();
+    }
+
+    private void UpdateHpText()
+    {
+        _gameUIView.SetHpText(_playerSettings.PlayerSettings.Hp);
     }
 
     private void OnStartButtonClicked()
@@ -64,8 +71,10 @@ public class GameRunner : MonoBehaviour
 	{
 		_isGameRunning = true;
 
-        _gameUIView.SetHpText(_playerSettings.PlayerSettings.Hp);
         _playerController.Start();
+        _enemiesController.Start();
+
+        UpdateHpText();
 
         Subscribe();
     }

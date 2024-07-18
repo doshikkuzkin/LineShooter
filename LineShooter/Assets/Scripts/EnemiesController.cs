@@ -7,7 +7,7 @@ public class EnemiesController
     private readonly EnemiesSettings _enemiesSettings;
 
     private readonly EnemyFactory _enemyFactory;
-    private readonly GameObjectPool<Enemy> _enemiesPool;
+    private readonly Dictionary<EnemyType, GameObjectPool<Enemy>> _enemyMap = new ();
     private readonly Transform[] _enemiesSpawnPoints;
 
     private readonly Vector3 _finishLinePosition;
@@ -17,7 +17,6 @@ public class EnemiesController
 
     private List<Enemy> _activeEnemies = new ();
     private List<Enemy> _enemiesToDestroy = new ();
-    private System.Random _random;
 
     public bool HasEnemiesLeft => _enemiesToSpawnLeft > 0 || _activeEnemies.Count > 0;
 
@@ -26,26 +25,30 @@ public class EnemiesController
     public EnemiesController(EnemiesSettings enemiesSettings, Transform[] enemiesSpawnPoints, Vector3 finishLinePosition)
     {
         _enemiesSettings = enemiesSettings;
-        _enemiesToSpawnLeft = enemiesSettings.EnemiesToSpawn;
         _enemiesSpawnPoints = enemiesSpawnPoints;
         _finishLinePosition = finishLinePosition;
 
-        _enemiesPool = new GameObjectPool<Enemy>(enemiesSettings.Prefab);
-        _enemyFactory = new EnemyFactory(_enemiesPool);
+        foreach (var enemyGraphics in enemiesSettings.EnemiesGraphics)
+        {
+            _enemyMap.Add(enemyGraphics.Type, new GameObjectPool<Enemy>(enemyGraphics.Prefab));
+        }
 
-        _random = new System.Random(Guid.NewGuid().GetHashCode());
+        _enemyFactory = new EnemyFactory(_enemyMap);
     }
 
     public void Reset()
     {
-        _enemiesToSpawnLeft = _enemiesSettings.EnemiesToSpawn;
-
         foreach (var enemy in _activeEnemies)
         {
-            _enemiesPool.Return(enemy);
+            _enemyMap[enemy.Type].Return(enemy);
         }
 
         _activeEnemies.Clear();
+    }
+
+    public void Start()
+    {
+        _enemiesToSpawnLeft = RandomHelper.GetRandomInt(_enemiesSettings.MinEnemiesCount, _enemiesSettings.MaxEnemiesCount);
     }
 
     public void Update()
@@ -56,33 +59,34 @@ public class EnemiesController
         }
 
         TryDestroyEnemies();
-        TryMoveEnemies();
-        TrySpawnEnemie();
+        MoveEnemies();
+        TrySpawnEnemy();
     }
 
-    private void TrySpawnEnemie()
+    private void TrySpawnEnemy()
     {
         if (_nextSpawnTime < Time.time && _enemiesToSpawnLeft > 0)
         {
-            SpawnEnemie();
+            SpawnEnemy();
 
-            _nextSpawnTime = Time.time + GetRandomFloat(_enemiesSettings.MinSpawnDelay, _enemiesSettings.MaxSpawnDelay);
+            _nextSpawnTime = Time.time + RandomHelper.GetRandomFloat(_enemiesSettings.MinSpawnDelay, _enemiesSettings.MaxSpawnDelay);
             _enemiesToSpawnLeft--;
         }
     }
 
-    private void SpawnEnemie()
+    private void SpawnEnemy()
     {
         var spawnPosition = GetRandomSpawnPoint().position;
-        var speed = GetRandomFloat(_enemiesSettings.MinSpeed, _enemiesSettings.MaxSpeed);
-        var enemy = _enemyFactory.Create(spawnPosition, speed, _enemiesSettings.Hp);
+        var type = RandomHelper.GetRandomEnum<EnemyType>();
+        var speed = RandomHelper.GetRandomFloat(_enemiesSettings.MinSpeed, _enemiesSettings.MaxSpeed);
+        var enemy = _enemyFactory.Create(type, spawnPosition, speed, _enemiesSettings.Hp);
 
         _activeEnemies.Add(enemy);
     }
 
     private Transform GetRandomSpawnPoint()
     {
-        var spawnPointIndex = _random.Next(0, _enemiesSpawnPoints.Length);
+        var spawnPointIndex = RandomHelper.GetRandomInt(0, _enemiesSpawnPoints.Length);
 
         return _enemiesSpawnPoints[spawnPointIndex];
     }
@@ -106,7 +110,7 @@ public class EnemiesController
         foreach (var enemy in _enemiesToDestroy)
         {
             _activeEnemies.Remove(enemy);
-            _enemiesPool.Return(enemy);
+            _enemyMap[enemy.Type].Return(enemy);
         }
 
         _enemiesToDestroy.Clear();
@@ -117,21 +121,11 @@ public class EnemiesController
         return position.y <= _finishLinePosition.y;
     }
 
-    private void TryMoveEnemies()
+    private void MoveEnemies()
     {
         foreach (var enemy in _activeEnemies)
         {
             enemy.Move();
         }
-    }
-
-    private float GetRandomFloat(float minValue, float maxValue)
-    {
-        var range = maxValue - minValue;
-
-        var sample = _random.NextDouble();
-        var scaled = (sample * range) + minValue;
-
-        return (float)scaled;
     }
 }
