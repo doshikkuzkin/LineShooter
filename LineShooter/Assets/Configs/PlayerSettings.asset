@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 292365740c8a08849b2c16e0897af8f8, type: 3}
+  m_Name: PlayerSettings
+  m_EditorClassIdentifier: 
+  PlayerSettings:
+    Hp: 5
+    Damage: 1
+    Prefab: {fileID: 2792971534621763075, guid: 2a3f4286732061a4f845a07752c53703, type: 3}
