@@ -54,6 +54,9 @@ public class GameRunner : MonoBehaviour
     {
         _restartGameUIView.gameObject.SetActive(false);
 
+        _enemiesController.Reset();
+        _playerController.Reset();
+
         StartGame();
     }
 
@@ -62,7 +65,6 @@ public class GameRunner : MonoBehaviour
 		_isGameRunning = true;
 
         _gameUIView.SetHpText(_playerSettings.PlayerSettings.Hp);
-        _enemiesController.Reset();
         _playerController.Start();
 
         Subscribe();
@@ -94,9 +96,14 @@ public class GameRunner : MonoBehaviour
 
     private void OnPlayerLost()
     {
+        OnGameEnded(false);
+    }
+
+    private void OnGameEnded(bool isWon)
+    {
         _isGameRunning = false;
 
-        _restartGameUIView.SetupText(false);
+        _restartGameUIView.SetupText(isWon);
         _restartGameUIView.gameObject.SetActive(true);
 
         Unsubscribe();
@@ -106,6 +113,13 @@ public class GameRunner : MonoBehaviour
     {
         if (!_isGameRunning)
         {
+            return;
+        }
+
+        if (!_enemiesController.HasEnemiesLeft)
+        {
+            OnGameEnded(true);
+
             return;
         }
 

@@ -16,4 +16,8 @@ MonoBehaviour:
     Hp: 5
     Damage: 1
     Speed: 3
+    ShootDelay: 1
+    ShootDistance: 4
+    ShootSpeed: 6
     Prefab: {fileID: 2792971534621763075, guid: 2a3f4286732061a4f845a07752c53703, type: 3}
+    ProjectilePrefab: {fileID: 8400692634451615498, guid: 4e78718fffbf4c24ea99e3a90ac6b538, type: 3}

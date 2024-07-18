@@ -75,9 +75,9 @@ public class EnemiesController
     {
         var spawnPosition = GetRandomSpawnPoint().position;
         var speed = GetRandomFloat(_enemiesSettings.MinSpeed, _enemiesSettings.MaxSpeed);
+        var enemy = _enemyFactory.Create(spawnPosition, speed, _enemiesSettings.Hp);
 
-        var enemie = _enemyFactory.Create(spawnPosition, speed);
-        _activeEnemies.Add(enemie);
+        _activeEnemies.Add(enemy);
     }
 
     private Transform GetRandomSpawnPoint()
@@ -91,7 +91,11 @@ public class EnemiesController
     {
         foreach (var enemy in _activeEnemies)
         {
-            if (IsReachedFinishLine(enemy.Position))
+            if (enemy.IsDestoyed)
+            {
+                _enemiesToDestroy.Add(enemy);
+            }
+            else if (IsReachedFinishLine(enemy.Position))
             {
                 EnemyHitFinishLine?.Invoke();
 

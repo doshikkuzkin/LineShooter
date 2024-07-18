@@ -38,13 +38,20 @@ public class PlayerController
     {
         _currentHp = _settings.Hp;
 
-        _player.SetUp(_settings.Speed, _playerSpawnPoint.position, _bottomLeftBoundary, _topRightBoundary);
+        _player.SetUp(_settings, _playerSpawnPoint.position, _bottomLeftBoundary, _topRightBoundary);
         _player.gameObject.SetActive(true);
+    }
+
+    public void Reset()
+    {
+        _player.Reset();
     }
 
     public void Update()
     {
         _player.Move();
+        _player.MoveProjectiles();
+        _player.Shoot();
     }
 
     public void DecreaseHp()

@@ -11,15 +11,15 @@ public class EnemyFactory
 		_enemyObectsPool = enemyObectsPool;
 	}
 
-	public Enemy Create(Vector3 spawnPosition, float speed)
+	public Enemy Create(Vector3 spawnPosition, float speed, int hp)
 	{
-		return SpawnEnemy(spawnPosition, speed);
+		return SpawnEnemy(spawnPosition, speed, hp);
 	}
 
-	private Enemy SpawnEnemy(Vector3 spawnPosition, float speed)
+	private Enemy SpawnEnemy(Vector3 spawnPosition, float speed, int hp)
 	{
 		var enemyObject = _enemyObectsPool.Get();
-		enemyObject.SetUp(spawnPosition, speed);
+		enemyObject.SetUp(spawnPosition, speed, hp);
 
 		return enemyObject;
 	}
